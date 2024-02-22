@@ -93,19 +93,22 @@ exports.generateThumbnail = async (file, context) => {
     // Delete the temp working directory and its files from the GCF's VM
     await fs.remove(workingDir);
 
+    // Establish a reference to firestore
     const firestore = new Firestore({
       projectId: "globaljags-project-41200"
     });
 
+    // Create a data object to store image info
     let dataObject = {};
 
+    // Add the image info to the object
     dataObject.imageName = finalFileName;
     dataObject.imageURL = tempFilePath;
     dataObject.lat = gpsDecimal.lat;
     dataObject.long = gpsDecimal.lon;
     dataObject.thumbURL = thumbPath;
 
-
+    // Create a new collection within the database and add the object
     let collectionRef = firestore.collection('photos');
     let documentRef = await collectionRef.add(dataObject);
     console.log(`Document Created: ${documentRef.id}`);
@@ -120,7 +123,10 @@ exports.generateThumbnail = async (file, context) => {
 
 // Helper functions
 async function readExifData (localFile) {
+  //Create a varibale to store the exif data
   let exifData;
+
+  // If the exif data exists, return the gps info, otherwise return an error
   try {
       exifData = await getExif(localFile);
       return(exifData.gps);
