@@ -78,7 +78,6 @@ exports.generateThumbnail = async (file, context) => {
 
     // Construct the HTTP URL of the uploaded image directly
     const finalImageUrl = `https://storage.cloud.google.com/${finalBucket.name}/${finalFileName}?authuser=1`;
-
     console.log(`Final Image URL: ${finalImageUrl}`);
 
     // Create a name for the thumbnail image
@@ -96,7 +95,6 @@ exports.generateThumbnail = async (file, context) => {
 
     // Construct the HTTP URL of the uploaded thumbnail image directly
     const thumbUrl = `https://storage.cloud.google.com/${thumbnailsBucket.name}/${thumbName}?authuser=1`;
-
     console.log(`Thumbnail Image HTTP URL: ${thumbUrl}`);
 
     // Delete the temp working directory and its files from the GCF's VM
