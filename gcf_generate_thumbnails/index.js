@@ -76,6 +76,11 @@ exports.generateThumbnail = async (file, context) => {
     // Upload our local version of the file to the final images bucket
     await finalBucket.upload(tempFilePath);
 
+    // Construct the HTTP URL of the uploaded image directly
+    const finalImageUrl = `https://storage.cloud.google.com/${finalBucket.name}/${finalFileName}?authuser=1`;
+
+    console.log(`Final Image URL: ${finalImageUrl}`);
+
     // Create a name for the thumbnail image
     // The value for this will be something like `thumb@64_1234567891234567.jpg`
     const thumbName = `thumb@64_${finalFileName}`;
@@ -86,9 +91,13 @@ exports.generateThumbnail = async (file, context) => {
 
     // Use the sharp library to generate the thumbnail image and save it to the thumbPath
     // Then upload the thumbnail to the thumbnailsBucket in cloud storage
-    await sharp(tempFilePath).resize(64).withMetadata().toFile(thumbPath).then(async () => {
+    await sharp(tempFilePath).resize(64).withMetadata().toFile(thumbPath);
       await thumbnailsBucket.upload(thumbPath);
-    })
+
+    // Construct the HTTP URL of the uploaded thumbnail image directly
+    const thumbUrl = `https://storage.cloud.google.com/${thumbnailsBucket.name}/${thumbName}?authuser=1`;
+
+    console.log(`Thumbnail Image HTTP URL: ${thumbUrl}`);
 
     // Delete the temp working directory and its files from the GCF's VM
     await fs.remove(workingDir);
@@ -103,10 +112,10 @@ exports.generateThumbnail = async (file, context) => {
 
     // Add the image info to the object
     dataObject.imageName = finalFileName;
-    dataObject.imageURL = tempFilePath;
+    dataObject.imageURL = finalImageUrl;
     dataObject.lat = gpsDecimal.lat;
     dataObject.long = gpsDecimal.lon;
-    dataObject.thumbURL = thumbPath;
+    dataObject.thumbURL = thumbUrl;
 
     // Create a new collection within the database and add the object
     let collectionRef = firestore.collection('photos');
